@@ -1,23 +1,53 @@
-import logo from './logo.svg';
+import { nanoid } from 'nanoid';
+import { useState } from 'react';
 import './App.css';
+import Clock from './components/clock/Clock';
+import Form from './components/form/Form';
 
 function App() {
+  const [clocks, setClocks] = useState([]);
+
+  function handleFormSubmit(form) {
+    setClocks((prevState) => [...prevState, {
+      id: nanoid(),
+      name: form.name,
+      userTimezone: form.userTimezone,
+    }]);
+  }
+
+  function getClockIndex(id) {
+    const index = clocks.findIndex((clock) => clock.id === id);
+
+    return index;
+  }
+
+  function handleDeleteClick(id) {
+    const index = getClockIndex(id);
+
+    const updatedClocks = [
+      ...clocks.slice(0, index),
+      ...clocks.slice(index + 1),
+    ];
+
+    setClocks(updatedClocks);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App-container">
+      <Form onFormSubmit={handleFormSubmit} />
+      <div className="App-clocks-container">
+        {clocks.map((clock) => {
+          return (
+            <Clock
+              key={clock.id}
+              id={clock.id}
+              name={clock.name}
+              userTimezone={clock.userTimezone}
+              onDeleteClick={handleDeleteClick}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
